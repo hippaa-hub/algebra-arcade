@@ -59,21 +59,23 @@ function Anatomy({ t, showHidden }: { t: Term; showHidden?: boolean }) {
     <div className="vis anatomy">
       <div className="anat-term">
         <span className="part coef">
-          {t.c < 0 && '−'}
-          {hiddenCoef ? <span className={`ghost ${reveal ? 'show' : ''}`}>1</span> : abs}
-          <small>coefficient</small>
+          <span className="main">
+            {t.c < 0 && '−'}
+            {hiddenCoef ? <span className={`ghost ${reveal ? 'show' : ''}`}>1</span> : abs}
+          </span>
         </span>
         {letters.map((l) => (
           <span key={l} className="part var" style={{ color: colourOf(l) }}>
-            {l}
-            <sup className={t.v[l] === 1 ? `ex ghost ${reveal ? 'show' : ''}` : 'ex exp'}>{t.v[l]}</sup>
-            <small>variable</small>
+            <span className="main">
+              {l}
+              <sup className={t.v[l] === 1 ? `ex ghost ${reveal ? 'show' : ''}` : 'ex exp'}>{t.v[l]}</sup>
+            </span>
           </span>
         ))}
       </div>
       <div className="anat-labels">
-        <span>number in front: <b>{t.c}</b></span>
-        {letters.map((l) => <span key={l}><b style={{ color: colourOf(l) }}>{l}</b> exponent <b>{t.v[l]}</b></span>)}
+        <span>coefficient <b>{String(t.c).replace('-', '−')}</b></span>
+        {letters.map((l) => <span key={l}>variable <b style={{ color: colourOf(l) }}>{l}</b>, exponent <b>{t.v[l]}</b></span>)}
       </div>
     </div>
   );

@@ -432,7 +432,6 @@ h1, h2, h3 { font-family: var(--font-head); margin: 0; }
 
 /* Exponents: always drawn as small raised numbers, whatever the font (see ui/M.tsx). */
 sup.ex { font-size: 0.6em; line-height: 0; position: relative; top: -0.15em; vertical-align: super; margin-left: 0.04em; font-weight: inherit; font-family: inherit; }
-.anat-term sup.ex { font-size: 1.6rem; top: 0; }
 .mkey.power sup.ex { font-size: 1.15em; top: -0.1em; }
 .big-letter sup.ex { font-size: 1.3rem; color: var(--pink); top: 0; }
 .touch-show .pow, .touch-term .pow { color: var(--pink); font-weight: 700; }
@@ -442,3 +441,14 @@ sup.ex { font-size: 0.6em; line-height: 0; position: relative; top: -0.15em; ver
 .mrow.powers { display: grid; grid-template-columns: auto repeat(5, 1fr); gap: 5px; }
 .mrow.powers .row-label { grid-row: span 2; align-self: center; }
 .mrow.powers .mkey { height: 40px; white-space: nowrap; }
+.anat-term .main { display: inline-flex; align-items: flex-start; white-space: nowrap; }
+.anat-term .main sup.ex { vertical-align: 0; top: -0.2em; position: relative; font-size: 0.55em; margin-left: 2px; }
+.anat-term { gap: 4px; align-items: flex-start; }
+.anat-term .main { line-height: 1.1; }
+.anat-term .main sup.ex { top: 0.12em; font-size: 0.5em; margin-left: 1px; }
+.anat-term .part small { margin-top: 2px; }
+.anat-term { gap: 2px; justify-content: center; padding-bottom: 6px; }
+.anat-term .part { position: relative; padding-bottom: 20px; }
+.anat-term .part small { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); white-space: nowrap; margin: 0; }
+.anat-term .part.var + .part.var small { display: none; }
+.anat-term .part { padding-bottom: 0; }
