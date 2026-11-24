@@ -429,3 +429,16 @@ h1, h2, h3 { font-family: var(--font-head); margin: 0; }
 .monster.hit svg { animation: shake .45s, flash .45s; }
 @keyframes flash { 30% { filter: brightness(2) saturate(.3); } }
 .numpad button { height: 46px; }
+
+/* Exponents: always drawn as small raised numbers, whatever the font (see ui/M.tsx). */
+sup.ex { font-size: 0.6em; line-height: 0; position: relative; top: -0.15em; vertical-align: super; margin-left: 0.04em; font-weight: inherit; font-family: inherit; }
+.anat-term sup.ex { font-size: 1.6rem; top: 0; }
+.mkey.power sup.ex { font-size: 1.15em; top: -0.1em; }
+.big-letter sup.ex { font-size: 1.3rem; color: var(--pink); top: 0; }
+.touch-show .pow, .touch-term .pow { color: var(--pink); font-weight: 700; }
+.pbase { display: inline-block; width: 0.55em; height: 0.7em; border: 2px solid #e48ab0; border-radius: 3px; vertical-align: -0.05em; }
+.mkey.power { font-size: 1.05rem; }
+.mkey.power sup.ex { font-size: 0.95em; top: -0.35em; color: #c2417a; }
+.mrow.powers { display: grid; grid-template-columns: auto repeat(5, 1fr); gap: 5px; }
+.mrow.powers .row-label { grid-row: span 2; align-self: center; }
+.mrow.powers .mkey { height: 40px; white-space: nowrap; }

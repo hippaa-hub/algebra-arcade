@@ -8,6 +8,7 @@ import { play } from '../sound';
 import { ExprPad } from '../widgets';
 import { QStepper } from './Aliens';
 import type { BoardProps } from './types';
+import { mx } from '../M';
 
 export const FOOD: Record<string, { emoji: string; name: string }> = {
   a: { emoji: '🥑', name: 'avocado' }, b: { emoji: '🍌', name: 'banana' }, c: { emoji: '🥕', name: 'carrot' },
@@ -22,14 +23,14 @@ export function SpotBoard({ q, locked, onSubmit }: BoardProps<SpotQ>) {
     <div className="board spot-board">
       <div className="order-ticket">
         <span className="customer">{customerFor(q.key)}</span>
-        <div><small>Order card</small><div className="ticket-term">{fmt(q.target, q.targetOrder)}</div><small>Bring EVERY ingredient that matches!</small></div>
+        <div><small>Order card</small><div className="ticket-term">{mx(fmt(q.target, q.targetOrder))}</div><small>Bring EVERY ingredient that matches!</small></div>
       </div>
       <div className="pantry">
         {q.options.map((o, i) => (
           <button key={i} type="button" className={`jar ${picked.includes(i) ? 'on' : ''}`} disabled={locked}
             onClick={() => setPicked(picked.includes(i) ? picked.filter((x) => x !== i) : [...picked, i])}>
             <span className="jar-lid" />
-            <span className="jar-term">{fmt(o.term, o.order)}</span>
+            <span className="jar-term">{mx(fmt(o.term, o.order))}</span>
             {picked.includes(i) && <span className="tick">✓</span>}
           </button>
         ))}
@@ -50,7 +51,7 @@ function CookTyped({ q, locked, onSubmit }: BoardProps<CookQ>) {
     <div className="board cook-board">
       <div className="order-ticket rush">
         <span className="customer">{customerFor(q.key)}</span>
-        <div><small>⚡ Rush hour! Simplify the order</small><div className="ticket-term">{q.expr}</div></div>
+        <div><small>⚡ Rush hour! Simplify the order</small><div className="ticket-term">{mx(q.expr)}</div></div>
       </div>
       <ExprPad value={typed} onChange={setTyped} letters={letters} disabled={locked} />
       <button className="btn primary wide" disabled={locked || !typed} onClick={() => onSubmit(checkTyped(q.expr, fmtExpr(q.answer), typed, 'collect'))}>Serve 🛎️</button>
@@ -93,12 +94,12 @@ function CookPlates({ q, locked, onSubmit }: BoardProps<CookQ>) {
     <div className="board cook-board">
       <div className="order-ticket">
         <span className="customer">{customerFor(q.key)}</span>
-        <div><small>New order!</small><div className="ticket-term">{q.expr}</div><small>{allPlaced ? 'Now count each plate.' : 'Drag each part of the order onto its plate.'}</small></div>
+        <div><small>New order!</small><div className="ticket-term">{mx(q.expr)}</div><small>{allPlaced ? 'Now count each plate.' : 'Drag each part of the order onto its plate.'}</small></div>
       </div>
       <div className="order-cards">
         {q.terms.map((t, i) => (where[i] === undefined ? (
           <div key={i} className={`food-card draggable ${shake === i ? 'shake' : ''}`} {...itemProps(String(i))}>
-            <b>{fmt(t.term, t.order)}</b>
+            <b>{mx(fmt(t.term, t.order))}</b>
             {picture && <span className="food-pile">{Array.from({ length: t.term.c }, (_, j) => <span key={j}>{FOOD[Object.keys(t.term.v)[0]]?.emoji}</span>)}</span>}
           </div>
         ) : null))}
@@ -108,7 +109,7 @@ function CookPlates({ q, locked, onSubmit }: BoardProps<CookQ>) {
           const on = q.terms.map((t, i) => ({ t, i })).filter(({ i }) => where[i] === k);
           return (
             <div key={k} className="plate" {...zoneProps(k)}>
-              <div className="plate-label">{label(k)}</div>
+              <div className="plate-label">{mx(label(k))}</div>
               <div className="plate-dish">
                 {on.map(({ t, i }) => (
                   <span key={i} className={`on-plate ${t.term.c < 0 ? 'neg' : ''}`}>
@@ -123,7 +124,7 @@ function CookPlates({ q, locked, onSubmit }: BoardProps<CookQ>) {
           );
         })}
       </div>
-      {bubble && <div className="hint-bubble pop-in">{bubble}</div>}
+      {bubble && <div className="hint-bubble pop-in">{mx(bubble)}</div>}
       {allPlaced && (
         <>
           <div className="final-order">Final order: <b>{summary.every(Boolean) ? fmtExpr(summary.filter((t) => t!.c !== 0) as never) : '…'}</b></div>

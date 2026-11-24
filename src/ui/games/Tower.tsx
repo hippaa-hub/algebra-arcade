@@ -7,6 +7,7 @@ import { normalise } from '../../math/algebra';
 import { AreaQuestion } from '../visuals/Visual';
 import { ExprPad, NumberPad, padNumber } from '../widgets';
 import type { BoardProps } from './types';
+import { mx } from '../M';
 
 export function Monster({ progress, hits }: { progress: number; hits: number }) {
   const hearts = 8;
@@ -56,7 +57,7 @@ export function TowerBoard({ q, locked, onSubmit, rightCount, progress }: BoardP
     <div className={`board tower-board ${boss ? 'boss-mode' : ''}`}>
       <TowerScene rightCount={rightCount} boss={boss} progress={progress} />
       <div className="panel spell">
-        <p className="spell-prompt">{q.prompt}</p>
+        <p className="spell-prompt">{mx(q.prompt)}</p>
         {q.rect && <AreaQuestion w={q.rect.w} h={q.rect.h} second={q.rect.second} />}
         {q.format === 'expr' && <ExprPad value={text} onChange={setText} letters={letters} disabled={locked} />}
         {q.format === 'number' && (
@@ -70,10 +71,10 @@ export function TowerBoard({ q, locked, onSubmit, rightCount, progress }: BoardP
             <div className="touch-show">
               {q.expr!.startsWith('(') && <span className="br">(</span>}
               {q.pieces!.map((p, i) => (
-                <button key={i} type="button" className={`piece ${picked.includes(i) ? 'on' : ''}`} disabled={locked} onClick={() => toggle(i)}>{p}</button>
+                <button key={i} type="button" className={`piece ${picked.includes(i) ? 'on' : ''}`} disabled={locked} onClick={() => toggle(i)}>{mx(p)}</button>
               ))}
               {q.expr!.startsWith('(') && <span className="br">)</span>}
-              <sup className="pow">{q.power}</sup>
+              {mx(q.power)}
             </div>
             <small className="soft">Tap each piece the power ² touches</small>
           </div>
@@ -81,7 +82,7 @@ export function TowerBoard({ q, locked, onSubmit, rightCount, progress }: BoardP
         {q.format === 'pick' && (
           <div className="pick-grid">
             {q.options!.map((o, i) => (
-              <button key={i} type="button" className={`pick ${picked.includes(i) ? 'on' : ''}`} disabled={locked} onClick={() => toggle(i)}>{o}</button>
+              <button key={i} type="button" className={`pick ${picked.includes(i) ? 'on' : ''}`} disabled={locked} onClick={() => toggle(i)}>{mx(o)}</button>
             ))}
           </div>
         )}

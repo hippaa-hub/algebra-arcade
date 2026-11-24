@@ -7,6 +7,7 @@ import { play } from '../sound';
 import { useDragDrop } from '../drag';
 import { Alien } from '../widgets';
 import type { BoardProps } from './types';
+import { mx } from '../M';
 
 /** A stepper that starts on "?" so the answer is never given away. */
 export function QStepper({ value, onChange, label, min = -20, max = 20, disabled }: { value: number | null; onChange: (n: number) => void; label: string; min?: number; max?: number; disabled?: boolean }) {
@@ -118,12 +119,12 @@ export function SortBoard({ q, locked, onOutcome }: BoardProps<SortQ>) {
       <div className="ships">
         {ships.map((s) => (
           <div key={s} className="ship" {...zoneProps(s)}>
-            <div className="ship-dome">{q.aliens.map((a, i) => (placed[i] === s ? <span key={i} className="mini">{fmt(a.term, a.order)}</span> : null))}</div>
-            <div className="ship-body">{familyText(s)}<small>family</small></div>
+            <div className="ship-dome">{q.aliens.map((a, i) => (placed[i] === s ? <span key={i} className="mini">{mx(fmt(a.term, a.order))}</span> : null))}</div>
+            <div className="ship-body">{mx(familyText(s))}<small>family</small></div>
           </div>
         ))}
       </div>
-      {bubble && <div className="hint-bubble pop-in">{bubble.text}</div>}
+      {bubble && <div className="hint-bubble pop-in">{mx(bubble.text)}</div>}
     </div>
   );
 }

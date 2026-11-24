@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import type { Visual } from '../../content/types';
 import { collect, familyKey, familyText, fmt, fmtExpr, fmtFactor, letterPart, mulTerms, powTerm, sup, type Term } from '../../math/term';
+import { mx } from '../M';
 
 const LETTER_COLOURS = ['#ff5fa2', '#4fb3ff', '#ffb020', '#38d9a9', '#a07bff', '#ff7a45'];
 const colourOf = (l: string) => LETTER_COLOURS[(l.charCodeAt(0) - 97) % LETTER_COLOURS.length];
@@ -65,7 +66,7 @@ function Anatomy({ t, showHidden }: { t: Term; showHidden?: boolean }) {
         {letters.map((l) => (
           <span key={l} className="part var" style={{ color: colourOf(l) }}>
             {l}
-            <sup className={t.v[l] === 1 ? `ghost ${reveal ? 'show' : ''}` : 'exp'}>{t.v[l]}</sup>
+            <sup className={t.v[l] === 1 ? `ex ghost ${reveal ? 'show' : ''}` : 'ex exp'}>{t.v[l]}</sup>
             <small>variable</small>
           </span>
         ))}
@@ -85,9 +86,9 @@ function Family({ terms, orders }: { terms: Term[]; orders?: (string[] | undefin
     <div className="vis family">
       {[...groups].map(([k, ts]) => (
         <div key={k} className="fam-group">
-          <div className="fam-head">{familyText(k)} family</div>
+          <div className="fam-head">{mx(familyText(k))} family</div>
           <div className="fam-members">{ts.map((x, i) => (
-            <span key={i} className="chip"><span className="dim">{fmt(x.t, x.o).replace(/[a-z].*$/, '') || ' '}</span><b>{letterPart(x.t.v, x.o)}</b></span>
+            <span key={i} className="chip"><span className="dim">{mx(fmt(x.t, x.o).replace(/[a-z].*$/, '') || ' ')}</span><b>{mx(letterPart(x.t.v, x.o))}</b></span>
           ))}</div>
         </div>
       ))}
@@ -100,10 +101,10 @@ function Compare({ a, b, orderA, orderB }: { a: Term; b: Term; orderA?: string[]
   const letters = [...new Set([...Object.keys(a.v), ...Object.keys(b.v)])].sort();
   return (
     <div className="vis compare">
-      <div className="cmp-row"><span className="chip big">{fmt(a, orderA)}</span><span className={`cmp-verdict ${same ? 'yes' : 'no'}`}>{same ? 'like terms ✓' : 'unlike ✗'}</span><span className="chip big">{fmt(b, orderB)}</span></div>
+      <div className="cmp-row"><span className="chip big">{mx(fmt(a, orderA))}</span><span className={`cmp-verdict ${same ? 'yes' : 'no'}`}>{same ? 'like terms ✓' : 'unlike ✗'}</span><span className="chip big">{mx(fmt(b, orderB))}</span></div>
       <table className="cmp-table"><tbody>
         {letters.map((l) => (
-          <tr key={l}><td>{a.v[l] ? `${l}${a.v[l] > 1 ? sup(a.v[l]) : '¹'}` : '—'}</td><td className={a.v[l] === b.v[l] ? 'ok' : 'bad'}>{a.v[l] === b.v[l] ? '=' : '≠'}</td><td>{b.v[l] ? `${l}${b.v[l] > 1 ? sup(b.v[l]) : '¹'}` : '—'}</td></tr>
+          <tr key={l}><td>{a.v[l] ? mx(`${l}${sup(a.v[l])}`) : '—'}</td><td className={a.v[l] === b.v[l] ? 'ok' : 'bad'}>{a.v[l] === b.v[l] ? '=' : '≠'}</td><td>{b.v[l] ? mx(`${l}${sup(b.v[l])}`) : '—'}</td></tr>
         ))}
       </tbody></table>
     </div>
@@ -116,7 +117,7 @@ function Collect({ terms }: { terms: Term[] }) {
   const result = collect(terms);
   return (
     <div className="vis collect">
-      <div className="col-line">{fmtExpr(terms)}</div>
+      <div className="col-line">{mx(fmtExpr(terms))}</div>
       {tick >= 1 && (
         <div className="col-groups">
           {fams.map((k, i) => {
@@ -124,14 +125,14 @@ function Collect({ terms }: { terms: Term[] }) {
             const sum = ts.reduce((s, t) => s + t.c, 0);
             return (
               <div key={k} className="col-group" style={{ borderColor: LETTER_COLOURS[i % 6] }}>
-                <div className="col-fam" style={{ color: LETTER_COLOURS[i % 6] }}>{familyText(k)}</div>
+                <div className="col-fam" style={{ color: LETTER_COLOURS[i % 6] }}>{mx(familyText(k))}</div>
                 <div>{ts.map((t) => (t.c < 0 ? `(${t.c})` : String(t.c))).join(' + ').replace(/-/g, '−')} = <b>{String(sum).replace('-', '−')}</b></div>
               </div>
             );
           })}
         </div>
       )}
-      {tick >= 2 && <div className="col-result">= {fmtExpr(result)}</div>}
+      {tick >= 2 && <div className="col-result">= {mx(fmtExpr(result))}</div>}
     </div>
   );
 }
@@ -147,7 +148,7 @@ function Fruit({ groups, result }: { groups: { emoji: string; n: number }[]; res
           </span>
         ))}
       </div>
-      {result && <div className="col-result">= {result}</div>}
+      {result && <div className="col-result">= {mx(result)}</div>}
     </div>
   );
 }
@@ -223,12 +224,12 @@ export function Expand({ factors }: { factors: Term[] }) {
             <span key={l} style={{ color: colourOf(l) }}>
               {factors.filter((f) => f.v[l]).length > 1
                 ? <>{l}: {factors.filter((f) => f.v[l]).map((f) => f.v[l]).join(' + ')} = <b>{ans.v[l]}</b> {l}’s in a row</>
-                : <>{l} comes along: <b>{l}{ans.v[l] > 1 ? sup(ans.v[l]) : ''}</b></>}
+                : <>{l} comes along: <b>{l}{mx(ans.v[l] > 1 ? sup(ans.v[l]) : '')}</b></>}
             </span>
           ))}
         </div>
       )}
-      {tick >= 3 && <div className="col-result">= {fmt(ans)}</div>}
+      {tick >= 3 && <div className="col-result">= {mx(fmt(ans))}</div>}
     </div>
   );
 }
@@ -241,7 +242,7 @@ function Chain({ letter, n, coef = 1 }: { letter: string; n: number; coef?: numb
         {coef !== 1 && <span className="cell num">{coef}</span>}
         {Array.from({ length: Math.min(tick, n) }, (_, i) => <span key={i} className="cell pop" style={{ background: colourOf(letter) }}>{letter}</span>)}
       </div>
-      <div className="vis-note">{coef !== 1 ? `${coef} × ` : ''}{Array(n).fill(letter).join(' × ')} {tick > n && <b>= {coef !== 1 ? coef : ''}{letter}{sup(n)}</b>}</div>
+      <div className="vis-note">{coef !== 1 ? `${coef} × ` : ''}{Array(n).fill(letter).join(' × ')} {tick > n && <b>= {coef !== 1 ? coef : ''}{letter}{mx(sup(n))}</b>}</div>
     </div>
   );
 }
@@ -250,10 +251,10 @@ function Copies({ inner, n }: { inner: Term; n: number }) {
   const tick = useTick(1, 1200, fmt(inner) + n);
   return (
     <div className="vis copies">
-      <div className="exp-line">({fmt(inner)}){sup(n)} = {Array(n).fill(fmtFactor(inner)).join(' × ')}</div>
+      <div className="exp-line">({mx(fmt(inner))}){mx(sup(n))} = {mx(Array(n).fill(fmtFactor(inner)).join(' × '))}</div>
       {tick >= 1 && <Expand factors={Array(n).fill(inner)} />}
       {tick < 1 && <div className="vis-note">{n} copies of everything in the bracket</div>}
-      <span className="sr-only">= {fmt(powTerm(inner, n))}</span>
+      <span className="sr-only">= {mx(fmt(powTerm(inner, n)))}</span>
     </div>
   );
 }
@@ -267,7 +268,7 @@ function Touch({ text, squared }: { text: string; squared: string[] }) {
           const hit = bracket ? ch !== '(' && ch !== ')' : i === text.replace(/[²³]$/, '').length - 1;
           return <span key={i} className={hit ? 'hit' : ''}>{ch}</span>;
         })}
-        <sup className="pow">{text.slice(-1)}</sup>
+        <span className="pow">{mx(text.slice(-1))}</span>
       </div>
       <div className="vis-note">The power touches: <b>{bracket ? 'everything inside the bracket' : squared.join(', ')}</b></div>
     </div>
@@ -279,15 +280,15 @@ export function Area({ w, h, second }: { w: Term; h: Term; second?: { w: Term; h
     <div className="vis area">
       <div className="rooms">
         <div className="room" style={{ flexGrow: Math.max(1, Math.abs(w.c)), aspectRatio: `${Math.max(1, Math.abs(w.c))} / ${Math.max(1, Math.abs(h.c))}` }}>
-          <span className="side top">{fmt(w)}</span><span className="side left">{fmt(h)}</span><span className="room-in">{fmt(mulTerms(w, h))}</span>
+          <span className="side top">{mx(fmt(w))}</span><span className="side left">{mx(fmt(h))}</span><span className="room-in">{mx(fmt(mulTerms(w, h)))}</span>
         </div>
         {second && (
           <div className="room two" style={{ flexGrow: Math.max(1, Math.abs(second.w.c)), aspectRatio: `${Math.max(1, Math.abs(second.w.c))} / ${Math.max(1, Math.abs(second.h.c))}` }}>
-            <span className="side top">{fmt(second.w)}</span><span className="side left">{fmt(second.h)}</span><span className="room-in">?</span>
+            <span className="side top">{mx(fmt(second.w))}</span><span className="side left">{mx(fmt(second.h))}</span><span className="room-in">?</span>
           </div>
         )}
       </div>
-      <div className="vis-note">area = length × width = {fmt(w)} × {fmt(h)} = <b>{fmt(mulTerms(w, h))}</b></div>
+      <div className="vis-note">area = length × width = {mx(fmt(w))} × {mx(fmt(h))} = <b>{mx(fmt(mulTerms(w, h)))}</b></div>
     </div>
   );
 }
@@ -296,7 +297,7 @@ export function Area({ w, h, second }: { w: Term; h: Term; second?: { w: Term; h
 export function AreaQuestion({ w, h, second }: { w: Term; h: Term; second?: { w: Term; h: Term } }) {
   const room = (a: Term, b: Term, cls = '') => (
     <div className={`room ${cls}`} style={{ flexGrow: Math.max(1, Math.abs(a.c)), aspectRatio: `${Math.max(1, Math.abs(a.c))} / ${Math.max(1, Math.abs(b.c))}` }}>
-      <span className="side top">{fmt(a)}</span><span className="side left">{fmt(b)}</span><span className="room-in">?</span>
+      <span className="side top">{mx(fmt(a))}</span><span className="side left">{mx(fmt(b))}</span><span className="room-in">?</span>
     </div>
   );
   return <div className="vis area"><div className="rooms">{room(w, h)}{second && room(second.w, second.h, 'two')}</div></div>;

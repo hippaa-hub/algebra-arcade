@@ -4,6 +4,7 @@ import cheer from '../assets/adele-cheer.webp';
 import happy from '../assets/adele-happy.webp';
 import think from '../assets/adele-think.webp';
 import wave from '../assets/adele-wave.webp';
+import { mx } from './M';
 
 export type Mood = 'wave' | 'happy' | 'think' | 'cheer';
 const FACES: Record<Mood, string> = { wave, happy, think, cheer };
@@ -53,11 +54,11 @@ export const padNumber = (s: string): number | null => (s.replace('−', '') ===
 export function ExprPad({ value, onChange, letters, disabled }: { value: string; onChange: (s: string) => void; letters: string[]; disabled?: boolean }) {
   const add = (k: string) => { if (!disabled && value.length < 40) onChange(value + k); };
   const key = (k: string, label = k, cls = '', aria = label) => (
-    <button key={`${k}-${label}`} type="button" className={`mkey ${cls}`} aria-label={aria} onClick={() => add(k)} disabled={disabled}>{label}</button>
+    <button key={`${k}-${label}`} type="button" className={`mkey ${cls}`} aria-label={aria} onClick={() => add(k)} disabled={disabled}>{cls === 'power' ? <><span className="pbase" aria-hidden="true" />{mx(label)}</> : mx(label)}</button>
   );
   return (
     <div className="exprpad">
-      <div className="expr-display" aria-live="polite">{value ? value.replace(/-/g, '−').replace(/\+/g, ' + ').replace(/−/g, ' − ').replace(/^ − /, '−') : <span className="placeholder">type your answer</span>}<span className="caret" /></div>
+      <div className="expr-display" aria-live="polite">{value ? mx(value.replace(/-/g, '−').replace(/\+/g, ' + ').replace(/−/g, ' − ').replace(/^ − /, '−')) : <span className="placeholder">type your answer</span>}<span className="caret" /></div>
       <div className="mrow">{letters.map((l) => key(l, l, 'letter'))}</div>
       <div className="mrow powers"><span className="row-label">power</span>
         {['⁰', '¹', '²', '³', '⁴', '⁵', '⁶', '⁷', '⁸', '⁹'].map((p, i) => key(p, p, 'power', `power digit ${i}`))}
@@ -96,7 +97,7 @@ export function Alien({ text, colour = 0, size = 96, mood = 'happy' }: { text: s
         <ellipse cx="16" cy="92" rx="9" ry="6" fill={c} />
         <ellipse cx="84" cy="92" rx="9" ry="6" fill={c} />
       </svg>
-      <span className="alien-term">{text}</span>
+      <span className="alien-term">{mx(text)}</span>
     </div>
   );
 }

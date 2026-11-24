@@ -31,6 +31,8 @@ function setTiles(root: Element, want: string[]) {
 }
 
 const SUP_DIGITS = '⁰¹²³⁴⁵⁶⁷⁸⁹';
+/** Screen text shows exponents as raised digits, so compare with superscripts turned into digits. */
+const plain = (s: string) => [...s].map((c) => (SUP_DIGITS.includes(c) ? String(SUP_DIGITS.indexOf(c)) : c)).join('');
 function typeExpr(text: string) {
   const pad = document.querySelector('.exprpad') as HTMLElement;
   click(btn('Clear', pad));
@@ -66,7 +68,7 @@ function answer(question: Question, wrong: boolean): boolean {
     case 'sort': {
       if (wrong) return false;
       for (const a of question.aliens) {
-        const el = [...document.querySelectorAll('.alien-field .draggable')].find((d) => d.querySelector('.alien-term')?.textContent === fmt(a.term, a.order))!;
+        const el = [...document.querySelectorAll('.alien-field .draggable')].find((d) => d.querySelector('.alien-term')?.textContent === plain(fmt(a.term, a.order)))!;
         tap(el);
         click(document.querySelector(`.ship[data-zone="${familyKey(a.term)}"]`));
         tick(100);
@@ -85,7 +87,7 @@ function answer(question: Question, wrong: boolean): boolean {
       if (wrong) return false;
       if (question.mode === 'type') { typeExpr(fmtExpr(question.answer)); clickText(/Serve/); return true; }
       for (const t of question.terms) {
-        const el = [...document.querySelectorAll('.order-cards .food-card')].find((d) => d.querySelector('b')?.textContent === fmt(t.term, t.order))!;
+        const el = [...document.querySelectorAll('.order-cards .food-card')].find((d) => d.querySelector('b')?.textContent === plain(fmt(t.term, t.order)))!;
         tap(el);
         click(document.querySelector(`.plate[data-zone="${familyKey(t.term)}"]`));
       }

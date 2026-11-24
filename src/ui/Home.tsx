@@ -4,6 +4,7 @@ import { currentStage } from '../engine/adaptive';
 import { rankOf } from '../engine/rewards';
 import type { Save } from '../engine/save';
 import { Guide, StarRow } from './widgets';
+import { mx } from './M';
 
 export function Home({ save, onPlay, onCollection, onParent, onToggleSound }: {
   save: Save; onPlay: () => void; onCollection: () => void; onParent: () => void; onToggleSound: () => void;
@@ -19,8 +20,8 @@ export function Home({ save, onPlay, onCollection, onParent, onToggleSound }: {
     : !cur
       ? <>You finished every world! 🏆 Keep your powers sharp in the Practice Arcade.</>
       : lessonNew
-        ? <>Next up: <b>{cur.stage.title}</b> in <b>{cur.level.world}</b>. I’ll show you the new rule first.</>
-        : <>Welcome back! Let’s keep going with <b>{cur.stage.title}</b>.</>;
+        ? <>Next up: <b>{mx(cur.stage.title)}</b> in <b>{cur.level.world}</b>. I’ll show you the new rule first.</>
+        : <>Welcome back! Let’s keep going with <b>{mx(cur.stage.title)}</b>.</>;
 
   return (
     <div className="screen home">

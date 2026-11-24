@@ -6,6 +6,7 @@ import type { MixQ } from '../../content/types';
 import { fmt, term } from '../../math/term';
 import { NumberPad, padNumber } from '../widgets';
 import type { BoardProps } from './types';
+import { mx } from '../M';
 
 export function MixBoard({ q, locked, onSubmit }: BoardProps<MixQ>) {
   const [sign, setSign] = useState<1 | -1 | null>(null);
@@ -31,13 +32,13 @@ export function MixBoard({ q, locked, onSubmit }: BoardProps<MixQ>) {
             {i > 0 && <span className="times">×</span>}
             <div className={`potion ${f.c < 0 ? 'neg' : 'pos'} ${brewing ? 'pour' : ''}`} style={{ animationDelay: `${i * 0.12}s` }}>
               <div className="potion-neck" />
-              <div className="potion-body"><span>{fmt(f)}</span></div>
+              <div className="potion-body"><span>{mx(fmt(f))}</span></div>
             </div>
           </div>
         ))}
       </div>
       <div className={`cauldron ${brewing ? 'bubbling' : ''} ${sign === 1 ? 'pos' : sign === -1 ? 'neg' : ''}`}>
-        <div className="cauldron-label">{built ? fmt(built).replace(/^$/, '?') : '?'}</div>
+        <div className="cauldron-label">{mx(built ? fmt(built).replace(/^$/, '?') : '?')}</div>
       </div>
       <div className="panel label-maker">
         <div className="lm-step"><span className="lm-n">1</span> Sign

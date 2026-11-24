@@ -22,6 +22,7 @@ import { Lesson } from './Lesson';
 import { play } from './sound';
 import { VisualView } from './visuals/Visual';
 import { Burst, Guide } from './widgets';
+import { mx } from './M';
 
 const CHEERS = ['Great discovery!', 'You’re getting it!', 'Brilliant!', 'Spot on!', 'Yes! Nailed it.', 'Super brain!'];
 const ALMOST = ['Almost!', 'Let’s try another way.', 'So close!', 'Good try!'];
@@ -233,14 +234,14 @@ export function Play({ level, stage, save, update, onExit, onStageDone, practice
         {save.streak >= 3 && <span className="streak-pill">🔥 {save.streak}</span>}
       </header>
       <div className="play-head">
-        <span className="world-tag">{qLevel.emoji} {practice ? 'Practice Arcade' : stage.title}</span>
+        <span className="world-tag">{qLevel.emoji} {mx(practice ? 'Practice Arcade' : stage.title)}</span>
         <span className={`tier t${tier}`} title="Difficulty">{'★'.repeat(tier)}{'☆'.repeat(3 - tier)}</span>
         {cur.confirm && <span className="confirm-tag">Similar one — show me you’ve got it!</span>}
       </div>
 
-      {mode === 'shown' && attempt === 0 && <div className="tip">💡 {q.hint}</div>}
+      {mode === 'shown' && attempt === 0 && <div className="tip">💡 {mx(q.hint)}</div>}
       {mode === 'button' && attempt === 0 && (
-        showHint ? <div className="tip">💡 {q.hint}</div>
+        showHint ? <div className="tip">💡 {mx(q.hint)}</div>
           : <button className="hint-btn" onClick={() => { setShowHint(true); setUsedHint(true); }}>💡 Hint</button>
       )}
 
@@ -248,15 +249,15 @@ export function Play({ level, stage, save, update, onExit, onStageDone, practice
         rightCount={rightCount} progress={progress} planets={save.planets} />
 
       {launch && <div className="launch-overlay"><span className="rocket launch">🚀</span><b>{launch}</b></div>}
-      {toast && <div className="toast pop-in">{toast}</div>}
+      {toast && <div className="toast pop-in">{mx(toast)}</div>}
 
       {feedback?.kind === 'retry' && (
         <div className="sheet retry pop-up" role="dialog" aria-label="Try again">
           <Guide mood="think" small />
           <div className="sheet-body">
             <h3>{pickOf(ALMOST)}</h3>
-            <p>{feedback.msg}</p>
-            {feedback.msg !== feedback.hint && <p className="soft">💡 {feedback.hint}</p>}
+            <p>{mx(feedback.msg)}</p>
+            {feedback.msg !== feedback.hint && <p className="soft">💡 {mx(feedback.hint)}</p>}
             <button className="btn primary wide" onClick={() => setFeedback(null)}>Try again</button>
           </div>
         </div>
@@ -268,8 +269,8 @@ export function Play({ level, stage, save, update, onExit, onStageDone, practice
           <Guide mood="cheer" small />
           <div className="sheet-body">
             <h3>{feedback.outcome === 'right' ? pickOf(CHEERS) : 'You got there!'} <span className="xp-gain">+{feedback.xp} XP</span></h3>
-            <p>{feedback.why}</p>
-            {feedback.extra.map((e) => <p key={e} className="extra pop-in">{e}</p>)}
+            <p>{mx(feedback.why)}</p>
+            {feedback.extra.map((e) => <p key={e} className="extra pop-in">{mx(e)}</p>)}
             {done && <p className="extra big pop-in">{done === 'level' ? `🏆 ${level.world} complete!` : '🎉 Stage complete!'}</p>}
             <button className="btn primary wide" onClick={next}>{done ? 'Continue' : 'Next ▶'}</button>
           </div>
@@ -280,11 +281,11 @@ export function Play({ level, stage, save, update, onExit, onStageDone, practice
         <div className="sheet shown pop-up" role="dialog" aria-label="Let’s look at it together">
           <div className="sheet-body">
             <h3>Let’s look at it together</h3>
-            <div className="rule-box">💡 {feedback.q.rule}</div>
+            <div className="rule-box">💡 {mx(feedback.q.rule)}</div>
             <VisualView v={feedback.q.demo} />
-            <p className="answer-line">Answer: <b>{answerText(feedback.q)}</b></p>
-            <p>{feedback.q.why}</p>
-            {feedback.extra.map((e) => <p key={e} className="extra">{e}</p>)}
+            <p className="answer-line">Answer: <b>{mx(answerText(feedback.q))}</b></p>
+            <p>{mx(feedback.q.why)}</p>
+            {feedback.extra.map((e) => <p key={e} className="extra">{mx(e)}</p>)}
             <button className="btn primary wide" onClick={next}>{done ? 'Continue' : 'Got it! Give me a similar one'}</button>
           </div>
         </div>
