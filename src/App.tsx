@@ -10,7 +10,7 @@ import { Collection, LevelDone, Parent, PracticeDone } from './ui/Screens';
 import { setMuted } from './ui/sound';
 
 type Screen =
-  | { s: 'home' } | { s: 'lesson'; stage: string } | { s: 'play'; stage: string } | { s: 'practice' }
+  | { s: 'home' } | { s: 'lesson'; stage: string } | { s: 'play'; stage: string } | { s: 'practice'; level?: LevelId }
   | { s: 'levelDone'; level: LevelId } | { s: 'practiceDone'; right: number; total: number }
   | { s: 'collection' } | { s: 'parent' };
 
@@ -42,11 +42,11 @@ export default function App() {
     const id = setInterval(() => {
       const learning = screen.s === 'lesson' || screen.s === 'play' || screen.s === 'practice';
       if (!learning || document.hidden || Date.now() - lastInput.current > 60_000) return;
-      const lv = currentStage(saveRef.current)?.level.id ?? 5;
+      const lv = (screen.s === 'lesson' || screen.s === 'play' ? allStages().find((x) => x.stage.id === screen.stage)?.level.id : screen.s === 'practice' ? screen.level : undefined) ?? currentStage(saveRef.current)?.level.id ?? 5;
       update((s) => { s.timeSec += 5; s.timeByLevel[lv] = (s.timeByLevel[lv] ?? 0) + 5; s.days[today()] = (s.days[today()] ?? 0) + 5; });
     }, 5000);
     return () => { clearInterval(id); window.removeEventListener('pointerdown', touch); window.removeEventListener('keydown', touch); };
-  }, [screen.s]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [screen]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => { window.scrollTo(0, 0); }, [screen]);
 
@@ -54,16 +54,29 @@ export default function App() {
   const pinned = screen.s === 'lesson' || screen.s === 'play' ? allStages().find((x) => x.stage.id === screen.stage) : undefined;
   const home = () => setScreen({ s: 'home' });
 
-  const playNext = () => {
+  const openStage = (id: string) => setScreen({ s: saveRef.current.lessonsSeen.includes(id) ? 'play' : 'lesson', stage: id });
+
+  // Next stage: carry on in the same world if it has stages left, otherwise the first unfinished stage anywhere.
+  const playNext = (inLevel?: LevelId) => {
+    const lv = inLevel ? LEVELS.find((l) => l.id === inLevel) : undefined;
+    const same = lv?.stages.find((st) => !saveRef.current.stagesDone.includes(st.id));
+    if (same) { openStage(same.id); return; }
     const c = currentStage(saveRef.current);
     if (!c) { setScreen({ s: 'practice' }); return; }
-    setScreen({ s: saveRef.current.lessonsSeen.includes(c.stage.id) ? 'play' : 'lesson', stage: c.stage.id });
+    openStage(c.stage.id);
+  };
+
+  // Every world is open: an unfinished world starts at its first unfinished stage, a finished one gives a practice round.
+  const openWorld = (id: LevelId) => {
+    const lv = levelOf(id);
+    const st = lv.stages.find((x) => !saveRef.current.stagesDone.includes(x.id));
+    if (st) openStage(st.id); else setScreen({ s: 'practice', level: id });
   };
 
   let body: ReactNode = null;
   switch (screen.s) {
     case 'home':
-      body = <Home save={save} onPlay={playNext} onCollection={() => setScreen({ s: 'collection' })} onParent={() => setScreen({ s: 'parent' })}
+      body = <Home save={save} onPlay={() => playNext()} onWorld={openWorld} onCollection={() => setScreen({ s: 'collection' })} onParent={() => setScreen({ s: 'parent' })}
         onToggleSound={() => update((s) => { s.muted = !s.muted; })} />;
       break;
     case 'lesson':
@@ -74,10 +87,11 @@ export default function App() {
     case 'play':
       if (!pinned) break;
       body = <Play key={pinned.stage.id} level={pinned.level} stage={pinned.stage} save={save} update={update} onExit={home}
-        onStageDone={(levelDone) => (levelDone ? setScreen({ s: 'levelDone', level: pinned.level.id }) : playNext())} />;
+        onStageDone={(levelDone) => (levelDone ? setScreen({ s: 'levelDone', level: pinned.level.id }) : playNext(pinned.level.id))} />;
       break;
     case 'practice':
-      body = <Play key="practice" level={LEVELS[4]} stage={PRACTICE_STAGE} save={save} update={update} onExit={home} onStageDone={home}
+      body = <Play key={`practice-${screen.level ?? 'all'}`} level={screen.level ? levelOf(screen.level) : LEVELS[4]} stage={PRACTICE_STAGE}
+        practicePool={screen.level ? levelOf(screen.level).stages.flatMap((x) => x.concepts) : undefined} save={save} update={update} onExit={home} onStageDone={home}
         practice={10} onPracticeDone={(right, total) => setScreen({ s: 'practiceDone', right, total })} />;
       break;
     case 'levelDone':

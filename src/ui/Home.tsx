@@ -1,4 +1,5 @@
-// Home: the guide, where she is in the journey, one big PLAY button, her stars and XP. Nothing to choose.
+// Home: the guide, where she is in the journey, one big PLAY button, her stars and XP. Every world can also be tapped to jump in.
+import type { LevelId } from '../content/types';
 import { LEVELS } from '../content/levels';
 import { currentStage } from '../engine/adaptive';
 import { rankOf } from '../engine/rewards';
@@ -6,8 +7,8 @@ import type { Save } from '../engine/save';
 import { Guide, StarRow } from './widgets';
 import { mx } from './M';
 
-export function Home({ save, onPlay, onCollection, onParent, onToggleSound }: {
-  save: Save; onPlay: () => void; onCollection: () => void; onParent: () => void; onToggleSound: () => void;
+export function Home({ save, onPlay, onWorld, onCollection, onParent, onToggleSound }: {
+  save: Save; onPlay: () => void; onWorld: (id: LevelId) => void; onCollection: () => void; onParent: () => void; onToggleSound: () => void;
 }) {
   const cur = currentStage(save);
   const stars = Object.values(save.levels).reduce((s, l) => s + l.stars, 0);
@@ -48,15 +49,16 @@ export function Home({ save, onPlay, onCollection, onParent, onToggleSound }: {
         {LEVELS.map((l, i) => {
           const st = save.levels[l.id];
           const isCur = cur?.level.id === l.id;
-          const locked = !st.done && !isCur;
           const stagesDone = l.stages.filter((s) => save.stagesDone.includes(s.id)).length;
           return (
-            <li key={l.id} className={`world-node theme-${l.theme} ${st.done ? 'done' : ''} ${isCur ? 'current' : ''} ${locked ? 'locked' : ''}`} style={{ marginLeft: `${[0, 20, 5, 22, 8][i]}%` }}>
-              <span className="node-emoji">{locked ? '🔒' : l.emoji}</span>
-              <span className="node-text">
-                <b>{i + 1}. {l.world}</b>
-                {st.done ? <StarRow n={st.stars} /> : isCur ? <small>{stagesDone}/{l.stages.length} stages · you are here</small> : <small>{l.game}</small>}
-              </span>
+            <li key={l.id} style={{ marginLeft: `${[0, 20, 5, 22, 8][i]}%` }}>
+              <button type="button" className={`world-node theme-${l.theme} ${st.done ? 'done' : ''} ${isCur ? 'current' : ''}`} onClick={() => onWorld(l.id)} aria-label={`Play ${l.world}`}>
+                <span className="node-emoji">{l.emoji}</span>
+                <span className="node-text">
+                  <b>{i + 1}. {l.world}</b>
+                  {st.done ? <><StarRow n={st.stars} /><small>tap to practise</small></> : isCur ? <small>{stagesDone}/{l.stages.length} stages · you are here</small> : <small>{l.game}{stagesDone ? ` · ${stagesDone}/${l.stages.length} stages` : ''}</small>}
+                </span>
+              </button>
             </li>
           );
         })}

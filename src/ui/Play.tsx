@@ -70,6 +70,8 @@ export interface PlayProps {
   onExit: () => void;
   /** Called when the stage is mastered (levelDone = the whole world is finished). */
   onStageDone: (levelDone: boolean) => void;
+  /** Practice only these concepts (replaying one finished world). */
+  practicePool?: ConceptId[];
   /** Practice mode after the journey: a mixed round of `practice` questions from every concept. */
   practice?: number;
   onPracticeDone?: (right: number, total: number) => void;
@@ -77,7 +79,7 @@ export interface PlayProps {
 
 const levelOfConcept = (c: ConceptId) => LEVELS.find((l) => l.id === CONCEPTS[c].level)!;
 
-export function Play({ level, stage, save, update, onExit, onStageDone, practice, onPracticeDone }: PlayProps) {
+export function Play({ level, stage, save, update, onExit, onStageDone, practice, practicePool, onPracticeDone }: PlayProps) {
   const seen = useMemo(() => new Set(save.seen), []); // eslint-disable-line react-hooks/exhaustive-deps
   const lastConcept = useRef<ConceptId | undefined>(undefined);
   const practiceCount = useRef(0);
@@ -87,7 +89,7 @@ export function Play({ level, stage, save, update, onExit, onStageDone, practice
     let c: ConceptId | null | undefined = concept;
     if (!c) {
       if (practice) {
-        const pool = Object.keys(CONCEPTS) as ConceptId[];
+        const pool = practicePool ?? (Object.keys(CONCEPTS) as ConceptId[]);
         const weak = pool.filter((id) => save.concepts[id].attempts > 0 && save.concepts[id].firstTry / save.concepts[id].attempts < 0.75);
         // Half the time, the concepts she finds hardest; otherwise anything.
         const from = weak.length && Math.random() < 0.5 ? weak : pool;
